@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  mysql-docker-container:
+    image: mysql:latest
+    networks:
+      - spring-batch-network
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin123
+      - MYSQL_DATABASE=spring_batch
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin123
+    volumes:
+      - /data/mysql
+      - ./dump:/docker-entrypoint-initdb.d
+  spring-boot-jpa-app:
+    image: spring-boot-jpa-image
+    networks:
+      - spring-batch-network
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile
+    depends_on:
+      - mysql-docker-container
+    ports:
+      - "8082:8080"
+    volumes:
+      - /data/spring-batch-app
+networks:
+  spring-batch-network:
